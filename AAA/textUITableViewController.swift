@@ -125,8 +125,8 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
         }
         return true
     }
-    func readContent(link:URL){
-        cont = try! String(contentsOf: link)
+    func readContent (link:URL)throws{
+        cont = try String(contentsOf: link)
         self.newNote.content = cont
         self.newNote.title = self.fileNameField.text!
         if (self.newNote.title == ""){
