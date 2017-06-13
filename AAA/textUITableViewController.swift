@@ -16,9 +16,13 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
     func updateNoteTitles() {
         self.noteTitles = PureTextNote.titleOfSavedNotes()
     }
+    var newNote = PureTextNote()
+    var cont:String = ""
+    var tit: String = ""
     //File manipulation
     
     private var myTextField: UITextField!
+    private var fileNameField: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,50 +65,74 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
         let tHeight: CGFloat = 30
         let posX: CGFloat = (self.view.bounds.width - tWidth)/2
         let posY: CGFloat = (self.view.bounds.height - tHeight)/4
+        let posY2: CGFloat = (self.view.bounds.height - tHeight)/5
         // UITextFieldを作成する.
         myTextField = UITextField(frame: CGRect(x: posX, y: posY, width: tWidth, height: tHeight))
+        fileNameField = UITextField(frame: CGRect(x: posX, y: posY2, width: tWidth, height: tHeight))
         // 表示する文字を代入する.
         myTextField.text = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
+        fileNameField.text = "File Name"
         // Delegateを自身に設定する
         myTextField.delegate = self
+        fileNameField.delegate = self
         // 枠を表示する.
         myTextField.borderStyle = .roundedRect
+        fileNameField.borderStyle = .roundedRect
         // クリアボタンを追加.
         myTextField.clearButtonMode = .whileEditing
         myTextField.backgroundColor = UIColor.lightGray
         myTextField.tag = 1001
+        fileNameField.clearButtonMode = .whileEditing
+        fileNameField.backgroundColor = UIColor.lightGray
+        fileNameField.tag = 1002
         // Viewに追加する
         self.view.addSubview(myTextField)
+        self.view.addSubview(fileNameField)
     }
     func textFieldDidBeginEditing(_ textField: UITextField) {
         print("textFieldDidBeginEditing: \(textField.text!)")
     }
     func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField.tag == 1002{
+            self.newNote.title = textField.text!
+        }
         print("textFieldDidEndEditing: \(textField.text!)")
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         print("textFieldShouldReturn \(textField.text!)")
         // 改行ボタンが押されたらKeyboardを閉じる処理.
         textField.resignFirstResponder()
-        let readIn = textField.text!
-        print(readIn)
-        //let test = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
-        readContent(link: URL(string:readIn)!)
-        
+        let readIn = self.myTextField.text
+        if self.fileNameField.text != "cancel"{
+            print(readIn!)
+            //let test = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
+            do{
+                try readContent(link: URL(string:readIn!)!)
+            }
+            catch{
+                print("Read file error")
+            }
+        }
         if let viewWithTag = self.view.viewWithTag(1001) {
             viewWithTag.removeFromSuperview()
         }else{
-            print("No!")
+            print("No! 1001")
+        }
+        if let viewWithTag = self.view.viewWithTag(1002) {
+            viewWithTag.removeFromSuperview()
+        }else{
+            print("No! 1002")
         }
         return true
     }
     func readContent(link:URL){
-        var newNote = PureTextNote()
-        var cont:String
         cont = try! String(contentsOf: link)
-        newNote.content = cont
-        newNote.title = PureTextNote.defaultTitle()
-        try? newNote.save()
+        self.newNote.content = cont
+        self.newNote.title = self.fileNameField.text!
+        if (self.newNote.title == ""){
+            self.newNote.title = PureTextNote.defaultTitle()
+        }
+        try? self.newNote.save()
         self.updateNoteTitles()
         if self.isViewLoaded {
             self.tableView.reloadData()
