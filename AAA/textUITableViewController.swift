@@ -106,11 +106,16 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
         if self.fileNameField.text != "cancel"{
             print(readIn!)
             //let test = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
-            do{
-                try readContent(link: URL(string:readIn!)!)
+            if readIn != ""{
+                do{
+                    try readContent(link: URL(string:readIn!)!)
+                }
+                catch{
+                    print("Read file error.")
+                }
             }
-            catch{
-                print("Read file error")
+            else{
+                print("No URL is written in.")
             }
         }
         if let viewWithTag = self.view.viewWithTag(1001) {
