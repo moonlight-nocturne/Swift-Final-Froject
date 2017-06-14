@@ -70,7 +70,8 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
         myTextField = UITextField(frame: CGRect(x: posX, y: posY, width: tWidth, height: tHeight))
         fileNameField = UITextField(frame: CGRect(x: posX, y: posY2, width: tWidth, height: tHeight))
         // 表示する文字を代入する.
-        myTextField.text = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
+        myTextField.text = "https://cdn.fbsbx.com/v/t59.2708-21/18221358_1324177670952874_5554888448973733888_n.txt/kino.txt?oh=e22b7d7a33edc9cbf60bf1ca64f6fb8f&oe=5942A6CC&dl=1"
+        
         fileNameField.text = "File Name"
         // Delegateを自身に設定する
         myTextField.delegate = self
@@ -103,10 +104,18 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
         // 改行ボタンが押されたらKeyboardを閉じる処理.
         textField.resignFirstResponder()
         let readIn = self.myTextField.text
-        if self.fileNameField.text != "cancel"{
+        if self.fileNameField.text != "Cancel"{
             print(readIn!)
             //let test = "https://cdn.fbsbx.com/v/t59.2708-21/18219948_1324960664207908_5163162044026847232_n.txt/the-ultimate-crisis.txt?oh=c9c901a49bd0a16f661ab3cafa37d6ca&oe=59411496&dl=1"
-            if readIn != ""{
+            if self.fileNameField.text == "Delete"{
+                do{
+                    try deleteFile(name: readIn!)
+                }
+                catch{
+                    print("Delete file error.")
+                }
+            }
+            else if readIn != ""{
                 do{
                     try readContent(link: URL(string:readIn!)!)
                 }
@@ -138,6 +147,13 @@ class textUITableViewController: UITableViewController,UITextFieldDelegate{
             self.newNote.title = PureTextNote.defaultTitle()
         }
         try? self.newNote.save()
+        self.updateNoteTitles()
+        if self.isViewLoaded {
+            self.tableView.reloadData()
+        }
+    }
+    func deleteFile (name:String) throws{
+        try PureTextNote.remove(title: name)
         self.updateNoteTitles()
         if self.isViewLoaded {
             self.tableView.reloadData()
